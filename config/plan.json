@@ -1,0 +1,113 @@
+{
+  "version": "0.3",
+  "note": "“我的情况 → 生成计划”的规则。次数规则是 demo 规则，未经康复师核实；角度按阶段取自 config/exercises.json 的 stageParams（来源：2026-10-28 康复治疗师访谈）。“说不清”按最保守的术后早期参数。按 PROJECT.md 的决定，不区分伤型。 v0.3（2026-10-30）：第 1 题从“哪条腿”改为“哪个关节”（左膝/右膝/左踝/右踝），按关节只安排对应动作（exercises.json 的 joint）；第 4 题新增“医生给的屈膝角度上限”（maxFlexion，只对膝关节），计划里目标不超过上限，超过上限语音提醒。",
+  "stages": [
+    {
+      "id": "lt2w",
+      "label": "2 周以内",
+      "reps": 5,
+      "params": "lt2w"
+    },
+    {
+      "id": "2to6w",
+      "label": "2–6 周",
+      "reps": 8,
+      "params": "2to6w"
+    },
+    {
+      "id": "gt6w",
+      "label": "6 周以上",
+      "reps": 10,
+      "params": "gt6w"
+    },
+    {
+      "id": "unknown",
+      "label": "说不清",
+      "reps": 8,
+      "params": "lt2w"
+    }
+  ],
+  "standingExercises": [
+    "chair_mini_squat"
+  ],
+  "repsMin": 3,
+  "repsMax": 20,
+  "todayPain": {
+    "from": 3,
+    "factor": 0.7
+  },
+  "lastYellow": {
+    "withinHours": 72,
+    "minus": 2
+  },
+  "lastRed": {
+    "withinHours": 48,
+    "factor": 0.5
+  },
+  "copy": {
+    "intro": "回答 4 个问题（约 30 秒），按你的情况生成今天的训练计划。答案只存在这台设备上。",
+    "stageLabel": "距离手术或受伤多久了？",
+    "standLabel": "医生是否允许你站着时让患侧承重？",
+    "stands": [
+      {
+        "value": "yes",
+        "label": "允许"
+      },
+      {
+        "value": "no",
+        "label": "不允许"
+      },
+      {
+        "value": "unsure",
+        "label": "不确定"
+      }
+    ],
+    "repsLabel": "医生或康复师有没有告诉你每个动作做几次？（没有就空着）",
+    "repsPlaceholder": "例如 10",
+    "submit": "生成我的训练计划",
+    "resultTitle": "你今天的训练计划",
+    "planNote": "按你填写的情况生成，具体动作和次数以你的医生或康复师的要求为准。",
+    "defaultNote": "这是通用示例计划。填写你的情况后，可以生成按你调整过的计划。",
+    "reasons": {
+      "stage": "距离手术或受伤 {stage}，每个动作 {n} 次",
+      "clinician": "按医生或康复师给的次数：{n} 次",
+      "todayPain": "今天疼痛 {pain} 分，次数减少一些",
+      "lastYellow": "上次训练后有点疼，次数减少一些",
+      "lastRed": "上次训练后很疼，今天只做一半；如果还没缓解，请先休息并联系医生或康复师",
+      "standExcluded": "医生允许患腿站立承重之前，先不做站立动作",
+      "earlyOnsite": "术后早期：请先在医生或治疗师现场指导下学会动作，再用 RehabGo 在家练",
+      "unknownStage": "不确定术后时间，先按术后早期的标准练，每个动作 {n} 次",
+      "guard": "按医生给的上限：屈膝不超过 {n}°，超过会语音提醒",
+      "guardTarget": "{name}：目标改为屈膝约 {m}°，留在医生给的上限以内",
+      "guardExcluded": "医生给的屈膝上限（{n}°）比这个动作需要的角度还小，先不做"
+    },
+    "partLabel": "哪个关节受伤了？",
+    "parts": [
+      {
+        "value": "left_knee",
+        "label": "左膝"
+      },
+      {
+        "value": "right_knee",
+        "label": "右膝"
+      },
+      {
+        "value": "left_ankle",
+        "label": "左踝"
+      },
+      {
+        "value": "right_ankle",
+        "label": "右踝"
+      }
+    ],
+    "guardWarn": "超过医生给你的角度了，慢慢回来",
+    "guardNote": "医生给的屈膝上限是 {n}°：弯到约 {m}° 就算做到，不用再往下弯；超过上限会语音提醒，这一次也不计数。"
+  },
+  "guard": {
+    "min": 30,
+    "max": 150,
+    "step": 5,
+    "default": 90,
+    "targetGapDeg": 10
+  }
+}

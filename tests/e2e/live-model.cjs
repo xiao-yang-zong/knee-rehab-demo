@@ -1,0 +1,32 @@
+// 线上真实模型加载测试：不替换 pose.js，统计模型文件大小、加载时间、报错
+const { chromium } = require('playwright');
+const [,, BASE, OUT] = process.argv;
+(async () => {
+  const b = await chromium.launch({ args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] });
+  const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, permissions: ['camera'] });
+  const p = await ctx.newPage();
+  const errs = [], ext = [], sizes = {};
+  p.on('pageerror', (e) => errs.push(String(e)));
+  p.on('console', (m) => { if (m.type() === 'error') errs.push(m.text()); });
+  p.on('response', async (r) => { const u = r.url(); if (!u.startsWith(BASE)) { ext.push(u); return; } if (/vendor/.test(u)) { try { sizes[u.split('/').pop()] = (await r.body()).length; } catch (_) {} } });
+  const t0 = Date.now();
+  await p.goto(BASE + '/');
+  await p.waitForSelector('[data-screen="welcome"]:not([hidden])');
+  const firstPaint = Date.now() - t0;
+  await p.click('label:has(#consent-tool)'); await p.click('label:has(#consent-doctor)'); await p.click('#welcome-go');
+  await p.click('#setup-skip');
+  await p.waitForSelector('#today-start');
+  await p.click('#today-start');
+  await p.waitForSelector('#check-layer.open'); await p.click('#check-go');
+  await p.waitForSelector('[data-screen="prep"]:not([hidden])');
+  const t1 = Date.now();
+  await p.click('#start-btn');
+  await p.waitForSelector('[data-screen="session"]:not([hidden])', { timeout: 20000 });
+  await p.waitForSelector('#session-loading', { state: 'hidden', timeout: 60000 });
+  const modelMs = Date.now() - t1;
+  await p.waitForTimeout(1500);
+  await p.screenshot({ path: `${OUT}/live-session-real-model.png` });
+  const total = Object.values(sizes).reduce((a, c) => a + c, 0);
+  console.log(JSON.stringify({ firstPaintMs: firstPaint, modelReadyMs: modelMs, vendorMB: (total / 1048576).toFixed(1), vendorFiles: sizes, prompt: await p.textContent('#prompt'), errors: errs, external: ext }, null, 2));
+  await b.close();
+})().catch((e) => { console.error('FAILED', e.message); process.exit(1); });

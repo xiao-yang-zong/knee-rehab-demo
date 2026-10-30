@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="description" content="RehabGo（康复Go）：用手机摄像头辅助膝关节、踝关节居家训练的计数、角度记录和安全提醒。视频只在本机处理。" />
+  <title>RehabGo · 康复Go</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b2545'/%3E%3Cpath d='M10 6 L15 17 L10 26' fill='none' stroke='%2322b8cf' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3Ccircle cx='15' cy='17' r='3' fill='%23ffffff'/%3E%3Cpath d='M19 22 L25 22' stroke='%2322b8cf' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- 图标（仿 SF Symbols 的简洁线性图标），用 <use href="#i-xxx"> 引用 -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 4.5 7.5 12l7.5 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11m0-11-11 11" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-today" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="3.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="15" r="2" fill="currentColor"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M5 20V12M10 20V6M15 20v-9M20 20V9" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24"><rect x="7" y="2.5" width="10" height="19" rx="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.5 18.5h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M5 20.5c.8-4 3.6-6 7-6s6.2 2 7 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8.5A2.5 2.5 0 0 1 6.5 6h1.6l1.4-2h5l1.4 2h1.6A2.5 2.5 0 0 1 20 8.5v8a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 16.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="12.5" r="3.4" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 11v5.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="7.6" r="1.3" fill="currentColor"/></symbol>
+    <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3.5 2.8 19.5h18.4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 9.5v4.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="16.8" r="1.2" fill="currentColor"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6.5 3h7l4.5 4.5V19a2 2 0 0 1-2 2h-9.5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M13 3v5h5M8.5 13h7M8.5 16.5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+    <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 17.5h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 6.5h15M9.5 6.5V4.5h5v2M6.5 6.5l1 13a1.5 1.5 0 0 0 1.5 1.5h6a1.5 1.5 0 0 0 1.5-1.5l1-13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-steth" viewBox="0 0 24 24"><path d="M6 3.5v5a4.5 4.5 0 0 0 9 0v-5M10.5 13v2.5a4 4 0 0 0 8 0V13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="18.5" cy="11" r="2" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H12v17H6.5A2.5 2.5 0 0 0 4 22.5zM20 5.5A2.5 2.5 0 0 0 17.5 3H12v17h5.5a2.5 2.5 0 0 1 2.5 2.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+    <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 21c-3.9 0-6.5-2.6-6.5-6.2 0-3.4 2.4-5.4 3.6-8 .9 1.6 1.6 2.5 2.9 3.1.2-2.6 1.4-4.9 3.3-6.4.3 3.6 3.2 5.6 3.2 10 0 4.4-2.7 7.5-6.5 7.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  </svg>
+
+  <main id="app">
+
+    <!-- ========== 欢迎（只在第一次出现） ========== -->
+    <section class="screen" data-screen="welcome" hidden>
+      <div class="content welcome">
+        <div class="welcome-icon" aria-hidden="true">
+          <svg viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#0b2545"/><path d="M10 6 L15 17 L10 26" fill="none" stroke="#22b8cf" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="15" cy="17" r="3" fill="#fff"/><path d="M19 22 L25 22" stroke="#22b8cf" stroke-width="3" stroke-linecap="round"/></svg>
+        </div>
+        <h1 class="welcome-title">欢迎使用 RehabGo</h1>
+        <p class="welcome-sub">把手机放在身体侧面，跟着语音做膝关节、踝关节训练。它帮你数次数、量角度，把每一次变化记下来。</p>
+
+        <ul class="features">
+          <li><span class="f-icon"><svg><use href="#i-phone"/></svg></span><div><strong>只要一部手机</strong><span>不用穿戴设备，不用注册账号</span></div></li>
+          <li><span class="f-icon"><svg><use href="#i-lock"/></svg></span><div><strong>画面不上传</strong><span>摄像头画面只在你的手机上处理</span></div></li>
+          <li><span class="f-icon"><svg><use href="#i-steth"/></svg></span><div><strong>按康复师建议设计</strong><span>动作和角度经康复治疗师初步核实</span></div></li>
+        </ul>
+
+        <div class="group consent">
+          <label class="row check-row">
+            <input type="checkbox" id="consent-tool" />
+            <span class="tick" aria-hidden="true"><svg><use href="#i-check"/></svg></span>
+            <span class="row-text" id="consent-tool-label"></span>
+          </label>
+          <label class="row check-row">
+            <input type="checkbox" id="consent-doctor" />
+            <span class="tick" aria-hidden="true"><svg><use href="#i-check"/></svg></span>
+            <span class="row-text" id="consent-doctor-label"></span>
+          </label>
+        </div>
+        <p class="footnote center"><a href="#about" class="link">阅读完整说明与隐私</a></p>
+      </div>
+      <div class="bottom-bar">
+        <button type="button" class="btn primary" id="welcome-go" disabled>继续</button>
+      </div>
+    </section>
+
+    <!-- ========== 我的情况：一题一屏 ========== -->
+    <section class="screen" data-screen="setup" hidden>
+      <header class="navbar">
+        <button type="button" class="nav-back" data-back><svg><use href="#i-back"/></svg><span>返回</span></button>
+        <div class="steps" id="setup-steps" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <button type="button" class="nav-action" id="setup-skip">跳过</button>
+      </header>
+      <div class="content">
+        <p class="eyebrow" id="setup-count"></p>
+        <h1 class="question" id="setup-question"></h1>
+        <p class="sub" id="setup-hint"></p>
+        <div class="group choices" id="setup-choices" role="radiogroup"></div>
+        <div id="setup-reps" hidden>
+          <div class="group">
+            <label class="row">
+              <span class="row-text">康复师告诉过我次数</span>
+              <input type="checkbox" class="switch" id="reps-toggle" />
+            </label>
+            <div class="row stepper-row" id="reps-stepper-row" hidden>
+              <span class="row-text">每个动作</span>
+              <div class="stepper">
+                <button type="button" id="reps-minus" aria-label="减少">−</button>
+                <output id="reps-value">10</output>
+                <button type="button" id="reps-plus" aria-label="增加">＋</button>
+              </div>
+            </div>
+          </div>
+          <p class="footnote" id="reps-note">没有特别交代就关着，我们按你的术后时间推荐次数。</p>
+          <div class="group" id="guard-group">
+            <label class="row">
+              <span class="row-text">医生给过屈膝角度上限</span>
+              <input type="checkbox" class="switch" id="guard-toggle" />
+            </label>
+            <div class="row stepper-row" id="guard-stepper-row" hidden>
+              <span class="row-text">最多弯到</span>
+              <div class="stepper">
+                <button type="button" id="guard-minus" aria-label="减少">−</button>
+                <output id="guard-value">90</output><span class="stepper-unit">°</span>
+                <button type="button" id="guard-plus" aria-label="增加">＋</button>
+              </div>
+            </div>
+          </div>
+          <p class="footnote" id="guard-note">例如“屈膝不要超过 90°”。填了以后，计划不会超过这个角度；训练中超过会语音提醒，那一次也不计数。</p>
+        </div>
+      </div>
+      <div class="bottom-bar" id="setup-bar" hidden>
+        <button type="button" class="btn primary" id="setup-finish">生成我的计划</button>
+      </div>
+    </section>
+
+    <!-- ========== 计划结果 ========== -->
+    <section class="screen" data-screen="plan" hidden>
+      <header class="navbar">
+        <button type="button" class="nav-back" data-back><svg><use href="#i-back"/></svg><span>修改</span></button>
+      </header>
+      <div class="content">
+        <p class="eyebrow">计划已生成</p>
+        <h1 class="large-title">你今天的训练</h1>
+        <p class="sub" id="plan-sub"></p>
+        <div class="group" id="plan-list"></div>
+        <details class="group disclosure" id="plan-why">
+          <summary class="row"><span class="row-text">为什么这样安排</span><svg class="chev"><use href="#i-chev"/></svg></summary>
+          <ul class="reasons" id="plan-reasons"></ul>
+        </details>
+        <p class="footnote" id="plan-note"></p>
+      </div>
+      <div class="bottom-bar">
+        <button type="button" class="btn primary" data-go="check">开始今天的训练</button>
+        <a class="btn plain" href="#today" id="plan-later">稍后再练</a>
+      </div>
+    </section>
+
+    <!-- ========== 今天（标签 1） ========== -->
+    <section class="screen tab" data-screen="today" hidden>
+      <header class="navbar inline"><span class="nav-title">今天</span></header>
+      <div class="content">
+        <p class="eyebrow" id="today-date"></p>
+        <h1 class="large-title">今天</h1>
+
+        <div class="notice red" id="today-red" hidden>
+          <svg><use href="#i-warn"/></svg><p id="today-red-text"></p>
+        </div>
+
+        <!-- 还没填我的情况 -->
+        <div class="hero-card" id="today-setup" hidden>
+          <div class="hero-art" aria-hidden="true" id="today-setup-art"></div>
+          <h2>30 秒生成你的训练计划</h2>
+          <p>回答 4 个问题：哪个关节、多久了、能不能站着承重、康复师的要求。</p>
+          <a class="btn primary" href="#setup/1">开始</a>
+          <button type="button" class="btn plain" id="today-skip">先用通用计划</button>
+        </div>
+
+        <!-- 已有计划 -->
+        <div id="today-plan" hidden>
+          <div class="ring-head">
+            <div class="ring" id="today-ring" aria-hidden="true">
+              <svg viewBox="0 0 44 44"><circle class="ring-bg" cx="22" cy="22" r="19"/><circle class="ring-fg" cx="22" cy="22" r="19" pathLength="100"/></svg>
+            </div>
+            <div>
+              <h2 id="today-plan-title">今天的训练</h2>
+              <p class="sub tight" id="today-plan-sub"></p>
+            </div>
+          </div>
+          <div class="group" id="today-list"></div>
+          <p class="footnote" id="today-note"></p>
+        </div>
+
+        <a class="stat-strip" href="#records" id="today-stats" hidden></a>
+      </div>
+      <div class="bottom-bar above-tabs" id="today-bar" hidden>
+        <button type="button" class="btn primary" id="today-start">开始训练</button>
+      </div>
+    </section>
+
+    <!-- ========== 动作准备 ========== -->
+    <section class="screen" data-screen="prep" hidden>
+      <header class="navbar">
+        <button type="button" class="nav-back" data-back><svg><use href="#i-back"/></svg><span>今天</span></button>
+        <span class="nav-title" id="prep-nav-title"></span>
+      </header>
+      <div class="content">
+        <p class="eyebrow" id="prep-count"></p>
+        <h1 class="large-title" id="prep-name"></h1>
+        <p class="sub" id="prep-meta"></p>
+        <p class="judge-line"><span class="badge tint" id="prep-judge"></span></p>
+        <div class="notice tint" id="prep-guard" hidden><svg><use href="#i-steth"/></svg><p id="prep-guard-text"></p></div>
+        <div class="banner-error" id="angle-banner" hidden></div>
+
+        <div class="demo-card" id="prep-demo"></div>
+
+        <h3 class="section-label">怎么做</h3>
+        <ol class="group steps-list" id="prep-steps"></ol>
+
+        <h3 class="section-label">摆放手机</h3>
+        <div class="group">
+          <div class="row icon-row"><span class="r-icon tint"><svg><use href="#i-camera"/></svg></span><span class="row-text" id="prep-camera"></span></div>
+          <div class="row">
+            <span class="row-text">拍哪一侧</span>
+            <div class="segmented small" id="prep-side" role="radiogroup" aria-label="拍哪一侧"></div>
+          </div>
+          <div class="row">
+            <span class="row-text">用哪个摄像头</span>
+            <div class="segmented small cam" id="prep-cam" role="radiogroup" aria-label="用哪个摄像头"></div>
+          </div>
+          <p class="row-note" id="prep-cam-note" hidden>后置摄像头拍得更清楚，但你看不到屏幕，跟着语音提示做就行。手机可以靠墙立在地上。</p>
+        </div>
+
+        <details class="group disclosure">
+          <summary class="row"><span class="r-icon orange"><svg><use href="#i-warn"/></svg></span><span class="row-text">注意事项</span><svg class="chev"><use href="#i-chev"/></svg></summary>
+          <div class="disclosure-body">
+            <p id="prep-caution"></p>
+            <p class="muted" id="prep-angle-note"></p>
+          </div>
+        </details>
+        <p class="status-line" id="status" aria-live="polite"></p>
+      </div>
+      <div class="bottom-bar">
+        <button type="button" class="btn primary" id="start-btn">开始</button>
+        <p class="bar-note">将打开摄像头和语音，画面只在本机处理 · <button type="button" class="link-btn" id="demo-btn">用录好的视频演示</button></p>
+        <input type="file" id="demo-file" accept="video/*" hidden />
+      </div>
+    </section>
+
+    <!-- ========== 训练中（全屏） ========== -->
+    <section class="screen session" data-screen="session" hidden>
+      <div class="stage" id="stage">
+        <video id="video" playsinline muted></video>
+        <canvas id="overlay"></canvas>
+      </div>
+      <div class="hud-top">
+        <button type="button" class="glass-btn" id="finish-btn" aria-label="结束这一组"><svg><use href="#i-close"/></svg></button>
+        <div class="hud-title"><strong id="hud-name"></strong><span id="hud-sub"></span></div>
+        <div class="glass-pill" id="hud-angle-pill"><span id="hud-angle-label">膝角</span> <span id="hud-angle">--</span></div>
+      </div>
+      <div class="hud-center">
+        <div class="count-ring">
+          <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="cr-bg" cx="60" cy="60" r="54"/><circle class="cr-fg" id="hold-ring" cx="60" cy="60" r="54" pathLength="100"/></svg>
+          <div class="count-num"><span id="hud-reps">0</span><small>/ <span id="hud-target">10</span></small></div>
+        </div>
+      </div>
+      <div class="hud-bottom">
+        <p class="glass-pill perf" id="perf-note" role="status" hidden></p>
+        <div class="prompt" id="prompt" aria-live="polite">准备中…</div>
+        <button type="button" class="btn stop" id="stop-btn"></button>
+      </div>
+      <div class="loading" id="session-loading">
+        <div class="spinner" aria-hidden="true"></div>
+        <p id="loading-text">正在准备…</p>
+      </div>
+    </section>
+
+    <!-- ========== 这一组做完 ========== -->
+    <section class="screen" data-screen="after" hidden>
+      <div class="content center-col">
+        <div class="big-check" id="after-icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="30"/><path d="m19 33 9 9 17-19"/></svg>
+        </div>
+        <h1 class="title1" id="after-title">做完了</h1>
+        <p class="sub" id="after-summary"></p>
+
+        <div id="after-ask">
+          <h2 class="ask" id="after-ask-text">膝盖现在感觉怎么样？</h2>
+          <div class="faces" id="faces"></div>
+        </div>
+
+        <div class="advice" id="after-advice" hidden><p id="after-advice-text"></p></div>
+      </div>
+      <div class="bottom-bar" id="after-bar" hidden>
+        <button type="button" class="btn primary" id="after-next"></button>
+        <button type="button" class="btn plain" id="after-stop">今天先到这</button>
+      </div>
+    </section>
+
+    <!-- ========== 今天完成 ========== -->
+    <section class="screen" data-screen="done" hidden>
+      <div class="content center-col">
+        <div class="done-ring" aria-hidden="true">
+          <svg viewBox="0 0 120 120"><circle class="ring-bg" cx="60" cy="60" r="52"/><circle class="ring-fg" cx="60" cy="60" r="52" pathLength="100"/></svg>
+          <svg class="done-mark" viewBox="0 0 24 24"><use href="#i-check"/></svg>
+        </div>
+        <h1 class="title1" id="done-title">今天的训练完成了</h1>
+        <p class="sub" id="done-sub"></p>
+        <div class="tiles" id="done-tiles"></div>
+        <div class="group left" id="done-progress"></div>
+        <p class="footnote left" id="done-foot"></p>
+      </div>
+      <div class="bottom-bar">
+        <a class="btn primary" href="#today">完成</a>
+        <button type="button" class="btn plain" data-action="report">生成摘要，发给康复师</button>
+      </div>
+    </section>
+
+
+    <!-- ========== 课程（标签 2） ========== -->
+    <section class="screen tab" data-screen="courses" hidden>
+      <header class="navbar inline"><span class="nav-title">课程</span></header>
+      <div class="content">
+        <h1 class="large-title">课程</h1>
+        <p class="sub">按关节和恢复阶段整理好的训练。每个动作都用摄像头计数，和“今天”的训练是同一套标准。</p>
+        <div class="segmented filter" id="course-filter" role="radiogroup" aria-label="按关节筛选"></div>
+        <div id="course-list"></div>
+      </div>
+    </section>
+
+    <!-- ========== 课程详情 ========== -->
+    <section class="screen" data-screen="course" hidden>
+      <header class="navbar">
+        <button type="button" class="nav-back" data-back><svg><use href="#i-back"/></svg><span>课程</span></button>
+        <span class="nav-title" id="course-nav-title"></span>
+      </header>
+      <div class="content">
+        <p class="eyebrow" id="course-eyebrow"></p>
+        <h1 class="large-title" id="course-title"></h1>
+        <p class="sub" id="course-sub"></p>
+        <div class="group pad"><p id="course-summary"></p></div>
+        <h3 class="section-label">适合</h3>
+        <div class="group pad"><ul class="bullet" id="course-fits"></ul></div>
+        <h3 class="section-label">先不要练</h3>
+        <div class="group pad warn-box"><ul class="bullet" id="course-avoid"></ul></div>
+        <h3 class="section-label">课程内容</h3>
+        <div class="group" id="course-lessons"></div>
+        <p class="footnote" id="course-source"></p>
+      </div>
+      <div class="bottom-bar">
+        <button type="button" class="btn primary" id="course-start">开始第一个动作</button>
+      </div>
+    </section>
+
+    <!-- ========== 康复师（标签 3） ========== -->
+    <section class="screen tab" data-screen="therapists" hidden>
+      <header class="navbar inline"><span class="nav-title">康复师</span></header>
+      <div class="content">
+        <h1 class="large-title">康复师</h1>
+        <div class="hero-card left">
+          <h2>把在家的训练带去复诊</h2>
+          <p>次数、角度变化、疼痛记录整理成一页摘要，复制后发给你的医生或康复师。</p>
+          <button type="button" class="btn primary" data-action="report">生成训练摘要</button>
+        </div>
+        <h3 class="section-label">康复师</h3>
+        <div class="notice gray"><svg><use href="#i-info"/></svg><p id="therapist-notice"></p></div>
+        <div class="segmented filter" id="therapist-filter" role="radiogroup" aria-label="按关节筛选"></div>
+        <div id="therapist-list"></div>
+        <h3 class="section-label">和康复机构合作（规划中）</h3>
+        <div class="group" id="therapist-plan"></div>
+      </div>
+    </section>
+
+    <!-- ========== 记录（标签 4） ========== -->
+    <section class="screen tab" data-screen="records" hidden>
+      <header class="navbar inline"><span class="nav-title">记录</span></header>
+      <div class="content">
+        <h1 class="large-title">记录</h1>
+
+        <div class="empty" id="records-empty" hidden>
+          <div class="empty-icon"><svg><use href="#i-chart"/></svg></div>
+          <h2>还没有训练记录</h2>
+          <p>完成第一次训练后，这里会显示你的次数、角度变化和训练后的感受。</p>
+        </div>
+
+        <div id="records-body" hidden>
+          <div class="tiles" id="rec-tiles"></div>
+
+          <h3 class="section-label">最近 7 天</h3>
+          <div class="group pad">
+            <div class="week-chart" id="week-chart" role="img" aria-label="最近 7 天每天完成的组数"></div>
+            <p class="chart-text" id="week-text"></p>
+          </div>
+
+          <div id="rec-progress-wrap">
+            <h3 class="section-label">角度变化</h3>
+            <div class="group" id="rec-progress"></div>
+            <p class="footnote" id="rec-progress-foot"></p>
+          </div>
+
+          <h3 class="section-label">历史</h3>
+          <div class="group" id="rec-history"></div>
+        </div>
+
+        <h3 class="section-label">工具与设置</h3>
+        <div class="group">
+          <button type="button" class="row link-row" data-action="report"><span class="r-icon tint"><svg><use href="#i-doc"/></svg></span><span class="row-text">生成训练摘要，发给康复师</span><svg class="chev"><use href="#i-chev"/></svg></button>
+          <a class="row link-row" href="#setup/1"><span class="r-icon green"><svg><use href="#i-person"/></svg></span><span class="row-text">我的情况</span><span class="row-value" id="rec-profile"></span><svg class="chev"><use href="#i-chev"/></svg></a>
+          <label class="row"><span class="r-icon blue"><svg><use href="#i-steth"/></svg></span><span class="row-text">医生允许我在家训练</span><input type="checkbox" class="switch" id="doctor-switch" /></label>
+          <a class="row link-row" href="#tips"><span class="r-icon orange"><svg><use href="#i-bulb"/></svg></span><span class="row-text">训练小贴士</span><svg class="chev"><use href="#i-chev"/></svg></a>
+          <a class="row link-row" href="#about"><span class="r-icon gray"><svg><use href="#i-info"/></svg></span><span class="row-text">关于与免责声明</span><svg class="chev"><use href="#i-chev"/></svg></a>
+        </div>
+        <div class="group">
+          <button type="button" class="row link-row destructive" id="clear-btn"><span class="row-text">清除这台设备上的全部数据</span></button>
+        </div>
+        <p class="footnote" id="clear-status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <!-- ========== 小贴士 ========== -->
+    <section class="screen" data-screen="tips" hidden>
+      <header class="navbar">
+        <button type="button" class="nav-back" data-back><svg><use href="#i-back"/></svg><span>记录</span></button>
+        <span class="nav-title">训练小贴士</span>
+      </header>
+      <div class="content">
+        <h1 class="large-title">训练小贴士</h1>
+        <div class="group" id="tips-list"></div>
+      </div>
+    </section>
+
+    <!-- ========== 关于与免责声明 ========== -->
+    <section class="screen" data-screen="about" hidden>
+      <header class="navbar">
+        <button type="button" class="nav-back" data-back><svg><use href="#i-back"/></svg><span>返回</span></button>
+        <span class="nav-title">关于</span>
+      </header>
+      <div class="content">
+        <h1 class="large-title">关于 RehabGo</h1>
+        <h3 class="section-label">免责声明</h3>
+        <div class="group pad"><p id="about-disclaimer"></p></div>
+        <h3 class="section-label">你的数据</h3>
+        <div class="group">
+          <div class="row icon-row"><span class="r-icon tint"><svg><use href="#i-camera"/></svg></span><span class="row-text">摄像头画面只在你的设备上处理，不上传、不保存。</span></div>
+          <div class="row icon-row"><span class="r-icon green"><svg><use href="#i-lock"/></svg></span><span class="row-text">训练记录和“我的情况”只存在这台设备的浏览器里，不需要账号。</span></div>
+          <div class="row icon-row"><span class="r-icon gray"><svg><use href="#i-trash"/></svg></span><span class="row-text">可以在“记录 → 清除全部数据”随时删除。清除浏览器数据或换手机，记录也会丢失。</span></div>
+        </div>
+        <h3 class="section-label">动作参数来源</h3>
+        <div class="group pad"><p class="muted" id="about-source">坐姿足跟滑动、扶椅微蹲的角度按 1 位康复治疗师的问卷和 2 位康复治疗师的访谈设定；坐姿伸膝暂为默认值，待核实。踝泵的次数和保持时间参考医院公开的康复计划，勾脚角度为默认值，待核实。角度由手机二维画面估算，仅供参考。</p></div>
+        <p class="footnote center">RehabGo（康复Go）· 演示版</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 底部标签栏（悬浮玻璃胶囊） -->
+  <nav class="tabbar" id="tabbar" aria-label="底部导航" hidden>
+    <a href="#today" data-tab="today"><svg><use href="#i-today"/></svg><span>今天</span></a>
+    <a href="#courses" data-tab="courses"><svg><use href="#i-book"/></svg><span>课程</span></a>
+    <a href="#therapists" data-tab="therapists"><svg><use href="#i-steth"/></svg><span>康复师</span></a>
+    <a href="#records" data-tab="records"><svg><use href="#i-chart"/></svg><span>记录</span></a>
+  </nav>
+
+  <!-- 底部弹出页：训练前确认 -->
+  <div class="sheet-layer" id="check-layer" hidden>
+    <div class="sheet-backdrop" data-sheet-close></div>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="check-title">
+      <div class="grabber" aria-hidden="true"></div>
+      <header class="sheet-head">
+        <button type="button" class="nav-action" data-sheet-close>取消</button>
+        <h2 id="check-title">训练前确认</h2>
+        <span class="spacer"></span>
+      </header>
+      <div class="sheet-body" id="check-form-wrap">
+        <div class="group" id="check-doctor" hidden>
+          <label class="row"><span class="row-text" id="check-doctor-label"></span><input type="checkbox" class="switch" id="doctor-confirm" /></label>
+        </div>
+        <div class="group pad pain-card">
+          <div class="pain-head"><span id="pain-head-text">现在膝盖疼吗？</span><output id="pain-value" class="pain-num">0</output></div>
+          <input type="range" id="pain" min="0" max="10" step="1" value="0" aria-label="疼痛程度 0 到 10 分" />
+          <div class="pain-scale"><span>0 不痛</span><span id="pain-word">不痛</span><span>10 最痛</span></div>
+        </div>
+        <h3 class="section-label">最近有没有以下情况</h3>
+        <div class="group" id="symptoms"></div>
+        <p class="footnote" id="check-foot"></p>
+        <p class="error" id="check-error" hidden></p>
+        <button type="button" class="btn primary" id="check-go">确认，开始</button>
+      </div>
+      <div class="sheet-body center-col" id="check-stop" hidden>
+        <div class="stop-icon"><svg><use href="#i-warn"/></svg></div>
+        <h2 class="title2">今天先不训练</h2>
+        <p class="sub" id="seek-care-text"></p>
+        <button type="button" class="btn primary" data-sheet-close>知道了</button>
+        <button type="button" class="btn plain" id="seek-care-back">返回修改</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部弹出页：训练摘要 -->
+  <div class="sheet-layer" id="report-layer" hidden>
+    <div class="sheet-backdrop" data-sheet-close></div>
+    <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="report-title">
+      <div class="grabber" aria-hidden="true"></div>
+      <header class="sheet-head">
+        <span class="spacer"></span>
+        <h2 id="report-title">训练摘要</h2>
+        <button type="button" class="nav-action strong" data-sheet-close>完成</button>
+      </header>
+      <div class="sheet-body">
+        <p class="sub tight">最近 7 天的次数、角度和感受。复制后可以直接粘贴到微信发给医生或康复师。</p>
+        <pre class="report" id="report-text"></pre>
+        <button type="button" class="btn primary" id="report-copy">复制</button>
+        <p class="footnote center" id="report-status" aria-live="polite"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 操作表：清除数据 -->
+  <div class="sheet-layer action" id="clear-layer" hidden>
+    <div class="sheet-backdrop" data-sheet-close></div>
+    <div class="action-sheet" role="dialog" aria-modal="true">
+      <div class="as-group">
+        <p class="as-title">清除后，全部训练记录、“我的情况”和确认信息都会删除，无法恢复。</p>
+        <button type="button" class="as-btn destructive" id="clear-yes">清除全部数据</button>
+      </div>
+      <div class="as-group"><button type="button" class="as-btn strong" data-sheet-close>取消</button></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+  <!-- 自托管的 MediaPipe Pose（旧版 solution），不依赖任何外部 CDN -->
+  <script src="vendor/mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

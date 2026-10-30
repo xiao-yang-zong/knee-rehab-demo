@@ -1,0 +1,21 @@
+const { chromium } = require('playwright');
+const fs = require('fs');
+const [,, BASE, FAKE, VIDEO] = process.argv;
+(async () => {
+  const b = await chromium.launch({ args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream'] });
+  const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, permissions: ['camera'] });
+  const p = await ctx.newPage(); const errs = [];
+  p.on('pageerror', (e) => errs.push(String(e)));
+  await p.route('**/vendor/mediapipe/pose/pose.js', (r) => r.fulfill({ contentType: 'application/javascript', body: fs.readFileSync(FAKE, 'utf8') }));
+  await p.route('**/config/exercises.json', async (r) => { const res = await r.fetch(); const d = await res.json(); d.exercises.forEach((e) => { if (e.holdSec) e.holdSec = 1; e.reps = 30; }); r.fulfill({ contentType: 'application/json', body: JSON.stringify(d) }); });
+  await p.goto(BASE + '/'); await p.waitForSelector('#welcome-go');
+  await p.click('label:has(#consent-tool)'); await p.click('label:has(#consent-doctor)'); await p.click('#welcome-go');
+  await p.click('#setup-skip'); await p.click('#today-start'); await p.waitForSelector('#check-layer.open'); await p.click('#check-go');
+  await p.waitForSelector('[data-screen="prep"]:not([hidden])');
+  await p.evaluate(() => { window.__FAKE_MODE = 'ext'; });
+  const t0 = Date.now();
+  await p.setInputFiles('#demo-file', VIDEO);
+  await p.waitForSelector('[data-screen="after"]:not([hidden])', { timeout: 90000 });
+  console.log(JSON.stringify({ secs: (Date.now() - t0) / 1000, after: await p.textContent('#after-summary'), errors: errs }));
+  await b.close();
+})().catch((e) => { console.error('FAILED', e.message); process.exit(1); });
