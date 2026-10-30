@@ -7,7 +7,7 @@
 - 比赛：2026 中国消费名品产业创新大赛，赛道 3（消费新场景 / 运动康复）。团队 7 人。校内提交 10/30，截止 10/31。
 - 协作约定：团队负责人是产品负责人。中文为主、技术词用英文；反馈直接；收住范围、守住截止线；关键逻辑要让负责人自己能讲清楚（答辩会问）。
 - 线上：https://www.rehabgo.online （= https://rehabgo.pages.dev）。GitHub 仓库 xiao-yang-zong/knee-rehab-demo，push 到 main → Cloudflare Pages 自动部署（只发布 index.html css js config assets vendor；访问 .md 等返回首页，不会泄露文档）。
-- 当前提交：22138c9「v0.8 界面改版 + v0.7 判定放宽」，已部署并逐文件核对线上一致。CLAUDE.md、本文件、tests/e2e/ 是交接时新加的，还没提交。
+- 当时的版本：「v0.8 界面改版 + v0.7 判定放宽」，已部署并逐文件核对线上一致。CLAUDE.md、本文件、tests/e2e/ 是交接时新加的，还没提交。
 
 ## 1. v0.7 判定放宽（为什么改、怎么改）
 问题：真人试用“很难刷出一两个”。原因（都在 js/counter.js 旧逻辑里）：
